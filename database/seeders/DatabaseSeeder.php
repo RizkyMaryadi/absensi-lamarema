@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Pegawai;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash; // WAJIB: Untuk enkripsi password
@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Membuat Akun Admin (Untuk login Dashboard)
-        User::create([
+        Pegawai::create([
             'name' => 'Admin Absensi',
             'email' => 'admin@lamarema.com',
             'password' => Hash::make('admin123'),
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Membuat Akun Pegawai (Untuk Test Scan Wajah & Telegram)
-        User::create([
+        Pegawai::create([
             'name' => 'Joko Test',
             'email' => 'joko@test.com',
             'password' => Hash::make('password'),

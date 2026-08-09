@@ -141,6 +141,87 @@
                         </div>
                     </div>
                 </div>
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2.5 pl-1">
+                        <i class="fas fa-file-signature text-yellow-600"></i> Pengajuan Izin / Sakit / Cuti
+                    </h2>
+                    
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 transform transition hover:shadow-lg">
+                        <form action="{{ route('pengajuan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5"><i class="fas fa-tags text-gray-400"></i> Jenis Pengajuan</label>
+                                    <select name="jenis" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:border-yellow-400" required>
+                                        <option value="">-- Pilih Jenis --</option>
+                                        <option value="Izin">Izin</option>
+                                        <option value="Sakit">Sakit</option>
+                                        <option value="Cuti">Cuti</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5"><i class="fas fa-camera text-gray-400"></i> Bukti Foto (Opsional)</label>
+                                    <input type="file" name="bukti_foto" accept="image/*" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-yellow-400">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5"><i class="fas fa-calendar-alt text-gray-400"></i> Tanggal Mulai</label>
+                                    <input type="date" name="tanggal_mulai" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:border-yellow-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5"><i class="fas fa-calendar-alt text-gray-400"></i> Tanggal Selesai</label>
+                                    <input type="date" name="tanggal_selesai" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:border-yellow-400" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5"><i class="fas fa-align-left text-gray-400"></i> Alasan Lengkap</label>
+                                    <textarea name="alasan" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 outline-none focus:border-yellow-400" placeholder="Jelaskan alasan izin / cuti..." required></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full md:w-auto bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i> Kirim Pengajuan
+                            </button>
+                        </form>
+
+                        <div class="mt-8 pt-6 border-t border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-800 mb-4"><i class="fas fa-list text-gray-400"></i> Riwayat Pengajuan Saya</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                        <tr>
+                                            <th class="p-3">Tanggal</th>
+                                            <th class="p-3">Jenis</th>
+                                            <th class="p-3">Alasan</th>
+                                            <th class="p-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-gray-700">
+                                        @forelse($riwayatPengajuan as $riwayat)
+                                            <tr>
+                                                <td class="p-3 font-medium whitespace-nowrap">
+                                                    {{ \Carbon\Carbon::parse($riwayat->tanggal_mulai)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($riwayat->tanggal_selesai)->format('d/m/Y') }}
+                                                </td>
+                                                <td class="p-3"><span class="font-bold text-blue-600">{{ $riwayat->jenis }}</span></td>
+                                                <td class="p-3 text-xs">{{ $riwayat->alasan }}</td>
+                                                <td class="p-3">
+                                                    @if($riwayat->status === 'Disetujui')
+                                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase">Disetujui</span>
+                                                    @elseif($riwayat->status === 'Ditolak')
+                                                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-bold uppercase">Ditolak</span>
+                                                    @else
+                                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-bold uppercase">Menunggu</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="p-6 text-center text-gray-400 italic text-xs">Belum ada riwayat pengajuan.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white rounded-3xl border-2 border-gray-100 shadow-xl p-7 space-y-5 sticky top-24 transform transition hover:shadow-2xl hover:border-yellow-200 group">

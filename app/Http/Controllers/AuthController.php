@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Str;
-use App\Models\User;
+use App\Models\Pegawai;
 use Carbon\Carbon;
 
 class AuthController extends Controller
@@ -65,10 +65,10 @@ class AuthController extends Controller
             'email' => 'required|email'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $pegawai = Pegawai::where('email', $request->email)->first();
 
         // Validasi jika user tidak ditemukan
-        if (!$user) {
+        if (!$pegawai) {
             return back()->with('error', 'Email tidak terdaftar di sistem kami.');
         }
 
@@ -86,7 +86,7 @@ class AuthController extends Controller
 
         // Simpan token ke database 
         DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $user->email],
+            ['email' => $pegawai->email],
             [
                 'token' => $token,
                 'created_at' => now()
@@ -94,7 +94,7 @@ class AuthController extends Controller
         );
         
         // Buat link reset
-        $resetLink = route('password.reset', ['token' => $token]) . '?email=' . urlencode($user->email);
+        $resetLink = route('password.reset', ['token' => $token]) . '?email=' . urlencode($pegawai->email);
 
         // Kembalikan ke view dengan membawa variabel link reset
         return back()->with('reset_link', $resetLink);
@@ -135,10 +135,10 @@ class AuthController extends Controller
             return back()->with('error', 'Waktu reset sudah habis. Silakan ulangi.');
         }
 
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $user->password = $request->password;
-            $user->save();
+        $pegawai = Pegawai::where('email', $request->email)->first();
+        if ($pegawai) {
+            $pegawai->password = $request->password;
+            $pegawai->save();
 
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
@@ -148,3 +148,4 @@ class AuthController extends Controller
         return back()->with('error', 'Gagal mengubah password.');
     }
 }
+

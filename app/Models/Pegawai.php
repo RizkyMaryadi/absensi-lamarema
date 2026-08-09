@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class Pegawai extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Database\Factories\PegawaiFactory> */
     use HasFactory, Notifiable;
+
+    protected $table = 'pegawai';
 
     /**
      * The attributes that are mass assignable.
@@ -21,13 +23,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',              // <-- Sudah Ada
-        'face_descriptor',   // <-- Sudah Ada
-        'position',          // <-- Sudah Ada
+        'role',
+        'face_descriptor',
+        'jabatan_id',
         'telegram_chat_id', 
         'phone_number',
-        // ---------------------------
     ];
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -53,11 +59,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke tabel izin.
-     * Menghubungkan satu user (pegawai) ke banyak data pengajuan izin.
+     * Relasi ke tabel pengajuan izin.
      */
-    public function data_izin()
+    public function pengajuanIzins()
     {
-        return $this->hasMany(Izin::class);
+        return $this->hasMany(PengajuanIzin::class);
     }
 }

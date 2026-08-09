@@ -15,9 +15,9 @@ class Attendance extends Model
     // Atau jika mau lebih spesifik:
     // protected $fillable = ['user_id', 'date', 'check_in', 'check_out', 'status', 'note'];
     
-    // Relasi ke User (Pegawai)
-    public function user()
+    // Relasi ke Pegawai
+    public function pegawai()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Pegawai::class);
     }
 }

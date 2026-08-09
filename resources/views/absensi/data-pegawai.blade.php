@@ -108,7 +108,7 @@
                             
                             <td class="px-7 py-5">
                                 <span class="bg-slate-100 text-slate-700 py-2 px-4 rounded-full text-xs font-bold border border-slate-200 inline-block shadow-inner capitalize">
-                                    {{ $p->position ?? 'Karyawan Toko' }}
+                                    {{ $p->jabatan->nama_jabatan ?? 'Karyawan Toko' }}
                                 </span>
                             </td>
 

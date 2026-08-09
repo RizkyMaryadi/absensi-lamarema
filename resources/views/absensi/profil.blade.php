@@ -64,6 +64,14 @@
                 <i class="fas fa-user-plus w-6 text-amber-500"></i> Tambah Pegawai
             </a>
 
+            <a href="/laporan-pengajuan" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
+                <i class="fas fa-envelope-open-text w-6 text-amber-500"></i> Laporan Pengajuan
+            </a>
+
+            <a href="/input-absen-manual" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
+                <i class="fas fa-edit w-6 text-amber-500"></i> Input Absen Manual
+            </a>
+
             <div class="my-4 border-t border-slate-100"></div>
             <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 mt-2">Konfigurasi</p>
 

@@ -108,6 +108,7 @@
     
     <script>
         const video = document.getElementById('video');
+        const overlay = document.getElementById('overlay');
         const cameraSelect = document.getElementById('cameraSelect');
         const loadingDiv = document.getElementById('loading');
         const statusText = document.getElementById('statusText');
@@ -206,18 +207,35 @@
         video.addEventListener('play', () => {
             if(detectionInterval) clearInterval(detectionInterval);
             
+            const displaySize = { width: video.width, height: video.height };
+            faceapi.matchDimensions(overlay, displaySize);
+
             detectionInterval = setInterval(async () => {
                 if (isProcessing || !faceMatcher || video.paused || video.ended) return;
 
                 const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                
+                const ctx = overlay.getContext('2d');
+                ctx.clearRect(0, 0, overlay.width, overlay.height);
 
                 if (detection) {
+                    const resizedDetections = faceapi.resizeResults(detection, displaySize);
                     const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+                    const box = resizedDetections.detection.box;
                     
                     if (bestMatch.label !== 'unknown') {
                         const [name, id] = bestMatch.label.split('|');
+                        const similarity = Math.round((1 - bestMatch.distance) * 100);
+                        const text = `${name} (${similarity}%)`;
+                        
+                        const drawBox = new faceapi.draw.DrawBox(box, { label: text, boxColor: '#10b981' });
+                        drawBox.draw(overlay);
+
                         catatKehadiran(id, name);
                     } else {
+                        const drawBox = new faceapi.draw.DrawBox(box, { label: 'Tidak Dikenal', boxColor: '#ef4444' });
+                        drawBox.draw(overlay);
+
                         statusText.innerText = "Wajah Tidak Dikenal";
                         statusText.classList.add('text-red-600');
                         setTimeout(() => {
@@ -251,6 +269,8 @@
                 } else {
                     // Waktu jeda habis, BUKA KUNCI SCAN
                     clearInterval(hitungMundur);
+                    const ctx = overlay.getContext('2d');
+                    ctx.clearRect(0, 0, overlay.width, overlay.height);
                     isProcessing = false; 
                     statusText.innerText = "Mencari Wajah...";
                     statusText.classList.remove('text-amber-600');
@@ -285,7 +305,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ user_id: userId })
+                    body: JSON.stringify({ pegawai_id: userId })
                 });
                 
                 const data = await response.json();
@@ -310,7 +330,7 @@
                 // 2. JIKA WARNING (Sudah Absen / Belum Jam Pulang)
                 else if (data.status === 'warning') {
                     const now = Date.now();
-                    const rejectedUserId = data.user_id || userId; 
+                    const rejectedUserId = data.pegawai_id || userId; 
                     const isSameUser = parseInt(rejectedUserId) === parseInt(lastSuccessfulUserId);
                     const isWithinCooldown = (now - lastSuccessTimestamp) < NOTIFICATION_COOLDOWN_MS;
 

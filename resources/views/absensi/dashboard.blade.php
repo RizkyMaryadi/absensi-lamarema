@@ -76,6 +76,13 @@
                 <i class="fas fa-user-plus w-6 text-amber-500"></i> Tambah Pegawai
             </a>
 
+            <a href="/laporan-pengajuan" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
+                <i class="fas fa-envelope-open-text w-6 text-amber-500"></i> Laporan Pengajuan
+            </a>
+
+            <a href="/input-absen-manual" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
+                <i class="fas fa-edit w-6 text-amber-500"></i> Input Absen Manual
+            </a>
             <div class="my-4 border-t border-slate-100"></div>
             <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 mt-2">Konfigurasi</p>
 
@@ -95,7 +102,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-100">
-            <p class="text-xs text-center text-slate-400">© 2026 Lamarema Fashion</p>
+            <p class="text-xs text-center text-slate-400">Â© 2026 Lamarema Fashion</p>
         </div>
     </div>
 
@@ -178,7 +185,7 @@
                                     
                                     <td class="px-6 py-4">
                                         <span class="bg-slate-100 text-slate-600 py-1.5 px-3 rounded-lg text-xs font-semibold border border-slate-200 inline-block">
-                                            {{ $p->position ?? '-' }}
+                                            {{ $p->jabatan->nama_jabatan ?? '-' }}
                                         </span>
                                     </td>
 
@@ -244,8 +251,8 @@
                                         <i class="fas fa-user-check text-xs"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-slate-800 text-sm">{{ $absen->user->name }}</p>
-                                        <p class="text-xs text-slate-500 mt-0.5">{{ $absen->user->position ?? '-' }}</p>
+                                        <p class="font-bold text-slate-800 text-sm">{{ $absen->pegawai->name }}</p>
+                                        <p class="text-xs text-slate-500 mt-0.5">{{ $absen->pegawai->jabatan->nama_jabatan ?? '-' }}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">

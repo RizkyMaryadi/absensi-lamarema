@@ -51,12 +51,12 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-900">Profil Pegawai Berhasil Dibuat!</h3>
-                        <p class="text-sm mt-1.5 text-yellow-800 opacity-95">Sistem telah otomatis membuatkan password **acak (random)** demi keamanan. Berikut adalah akses login sementara untuk pegawai bernama <span class="font-extrabold text-gray-900">{{ $user->name }}</span>. Silakan **CATAT SEKARANG**, karena informasi ini hanya akan muncul sekali!</p>
+                        <p class="text-sm mt-1.5 text-yellow-800 opacity-95">Sistem telah otomatis membuatkan password **acak (random)** demi keamanan. Berikut adalah akses login sementara untuk pegawai bernama <span class="font-extrabold text-gray-900">{{ $pegawai->name }}</span>. Silakan **CATAT SEKARANG**, karena informasi ini hanya akan muncul sekali!</p>
                         
                         <div class="mt-4 bg-white border border-yellow-100 p-4 rounded-xl flex items-center justify-between shadow-inner">
                             <div>
                                 <p class="text-xs text-gray-400">Email Login:</p>
-                                <p class="font-bold text-gray-900 text-sm">{{ $user->email }}</p>
+                                <p class="font-bold text-gray-900 text-sm">{{ $pegawai->email }}</p>
                             </div>
                             <div class="border-l border-gray-100 h-10"></div>
                             <div>
@@ -83,8 +83,8 @@
                         <i class="fas fa-user-tag"></i>
                         <span class="absolute bottom-0 right-0 bg-blue-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-[10px] border-2 border-white shadow-md"><i class="fas fa-camera"></i></span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800">{{ $user->name }}</h3>
-                    <p class="text-sm font-semibold text-slate-500 mt-1 bg-white inline-block px-3 py-1 rounded-lg border border-slate-200 shadow-inner">{{ $user->position ?? 'Pegawai' }}</p>
+                    <h3 class="text-xl font-bold text-slate-800">{{ $pegawai->name }}</h3>
+                    <p class="text-sm font-semibold text-slate-500 mt-1 bg-white inline-block px-3 py-1 rounded-lg border border-slate-200 shadow-inner">{{ $pegawai->jabatan->nama_jabatan ?? 'Pegawai' }}</p>
                 </div>
 
                 <div class="mb-6 flex-grow">
@@ -316,7 +316,7 @@
                     "X-CSRF-TOKEN": "{{ csrf_token() }}"
                 },
                 body: JSON.stringify({
-                    user_id: "{{ $user->id }}",
+                    pegawai_id: "{{ $pegawai->id }}",
                     face_descriptor: JSON.stringify(descriptorArray),
                     photo: photoBase64
                 })

@@ -22,6 +22,6 @@ class AppServiceProvider extends ServiceProvider
     {
         //2. TAMBAHKAN KODE INI
         // Memaksa browser memuat semua file aset (CSS, JS, Gambar, Model Wajah) lewat HTTPS
-        URL::forceScheme('https');
+        // URL::forceScheme('https');
     }
 }

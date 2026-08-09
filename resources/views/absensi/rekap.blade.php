@@ -67,6 +67,10 @@
             <a href="/tambah-pegawai" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
                 <i class="fas fa-user-plus w-6 text-amber-500"></i> Tambah Pegawai
             </a>
+            
+            <a href="/input-absen-manual" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
+                <i class="fas fa-edit w-6 text-amber-500"></i> Input Absen Manual
+            </a>
             <div class="my-4 border-t border-slate-100"></div>
             <a href="/pengaturan" class="flex items-center gap-3 text-slate-600 hover:text-amber-600 hover:bg-amber-50 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent hover:border-amber-100 font-medium">
                 <i class="fas fa-sliders-h w-6 text-amber-500"></i> Pengaturan Sistem
@@ -83,19 +87,36 @@
                         <i class="fas fa-arrow-left"></i>
                     </a>
                     <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Rekap Data Absensi</h2>
+                    <a href="/input-absen-manual" class="ml-4 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2">
+                        <i class="fas fa-edit"></i> Input Manual
+                    </a>
                 </div>
                 <p class="text-sm text-slate-500 ml-11">Laporan kehadiran harian pegawai Lamarema Fashion</p>
             </div>
 
             <div class="bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm w-full lg:w-auto">
                 <form action="{{ url()->current() }}" method="GET" class="flex flex-wrap items-center gap-3">
+                    <div class="relative flex items-center bg-slate-50 rounded-xl border border-slate-200">
+                        <select name="filter_type" class="bg-transparent py-2.5 px-4 text-sm font-bold text-slate-700 outline-none cursor-pointer w-full appearance-none pr-8" onchange="this.form.submit()">
+                            <option value="harian" {{ $filter_type == 'harian' ? 'selected' : '' }}>Harian</option>
+                            <option value="bulanan" {{ $filter_type == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+
                     <div class="relative flex items-center bg-slate-50 rounded-xl border border-slate-200 w-full md:w-auto">
                         <div class="pl-3.5 pr-2 text-slate-400"><i class="fas fa-search"></i></div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama..." class="bg-transparent py-2.5 pr-4 text-sm font-medium outline-none">
                     </div>
 
                     <div class="relative flex items-center bg-slate-50 rounded-xl border border-slate-200">
-                        <input type="date" name="tanggal" value="{{ $tanggal }}" class="bg-transparent py-2.5 px-4 text-sm font-bold text-slate-700 outline-none cursor-pointer w-full">
+                        @if($filter_type == 'harian')
+                            <input type="date" name="tanggal" value="{{ $tanggal }}" class="bg-transparent py-2.5 px-4 text-sm font-bold text-slate-700 outline-none cursor-pointer w-full">
+                        @else
+                            <input type="month" name="bulan" value="{{ $bulan }}" class="bg-transparent py-2.5 px-4 text-sm font-bold text-slate-700 outline-none cursor-pointer w-full">
+                        @endif
                     </div>
 
                     <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm">
@@ -128,10 +149,10 @@
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
-                            <label for="user_id" class="block text-sm font-bold text-slate-700 mb-2">Pilih Pegawai</label>
-                            <select name="user_id" id="user_id" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors" required>
+                            <label for="pegawai_id" class="block text-sm font-bold text-slate-700 mb-2">Pilih Pegawai</label>
+                            <select name="pegawai_id" id="pegawai_id" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors" required>
                                 <option value="">-- Pilih Pegawai --</option>
-                                @foreach(\App\Models\User::where('role', 'pegawai')->get() as $peg)
+                                @foreach(\App\Models\Pegawai::where('role', 'pegawai')->get() as $peg)
                                     <option value="{{ $peg->id }}">{{ $peg->name }}</option>
                                 @endforeach
                             </select>
@@ -165,10 +186,16 @@
             <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white">
                 <h3 class="text-lg font-bold text-slate-800">
                     <i class="fas fa-list-ul text-amber-500 mr-2"></i>Data Kehadiran: 
-                    <span class="text-amber-600">{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</span>
+                    <span class="text-amber-600">
+                        @if($filter_type == 'harian')
+                            {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
+                        @else
+                            {{ \Carbon\Carbon::parse($bulan . '-01')->translatedFormat('F Y') }}
+                        @endif
+                    </span>
                 </h3>
 
-                <a href="{{ route('export.excel', ['tanggal' => $tanggal, 'search' => request('search')]) }}" 
+                <a href="{{ route('export.excel', ['filter_type' => $filter_type, 'tanggal' => $tanggal, 'bulan' => $bulan, 'search' => request('search')]) }}" 
                    class="flex justify-center items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300">
                     <i class="fas fa-file-excel"></i> Export ke Excel
                 </a>
@@ -195,10 +222,10 @@
                             <td class="px-6 py-4 font-medium text-slate-700">
                                 {{ \Carbon\Carbon::parse($absen->date)->translatedFormat('d M Y') }}
                             </td>
-                            <td class="px-6 py-4 font-bold text-slate-800">{{ $absen->user->name }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-800">{{ $absen->pegawai->name ?? 'Tidak Diketahui' }}</td>
                             <td class="px-6 py-4">
                                 <span class="bg-slate-100 text-slate-600 py-1 px-3 rounded-lg text-xs font-semibold">
-                                    {{ $absen->user->position ?? '-' }}
+                                    {{ $absen->pegawai->jabatan->nama_jabatan ?? '-' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">

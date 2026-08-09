@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Pegawai;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -76,16 +76,16 @@ class TelegramController extends Controller
         }
 
         // Cari pegawai di tabel users berdasarkan nomor HP
-        $user = User::where('phone_number', $normalizedPhone)
+        $pegawai = Pegawai::where('phone_number', $normalizedPhone)
                     ->orWhere('phone_number', $phoneNumber)
                     ->first();
 
-        if ($user) {
+        if ($pegawai) {
             // JIKA KETEMU: Update telegram_chat_id yang tadinya NULL
-            $user->telegram_chat_id = $chatId;
-            $user->save();
+            $pegawai->telegram_chat_id = $chatId;
+            $pegawai->save();
 
-            $pesan = "✅ *SINKRONISASI BERHASIL!*\n\nNomor HP Anda telah terverifikasi.\nAkun atas nama *{$user->name}* sekarang terhubung dengan Bot Absensi Lamarema. Anda akan menerima notifikasi setiap kali melakukan absen.";
+            $pesan = "✅ *SINKRONISASI BERHASIL!*\n\nNomor HP Anda telah terverifikasi.\nAkun atas nama *{$pegawai->name}* sekarang terhubung dengan Bot Absensi Lamarema. Anda akan menerima notifikasi setiap kali melakukan absen.";
         } else {
             // JIKA TIDAK KETEMU: Tolak dan suruh lapor Admin
             $pesan = "❌ *SINKRONISASI GAGAL!*\n\nNomor HP Anda tidak ditemukan di sistem kami. Pastikan Admin sudah mendaftarkan nomor ini, lalu ketik /start untuk mencoba lagi.";
@@ -100,3 +100,4 @@ class TelegramController extends Controller
         ]);
     }
 }
+

@@ -2,10 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IzinController;
 use App\Http\Controllers\TelegramController;
+use App\Http\Controllers\JabatanController;
+use App\Http\Controllers\PengajuanIzinController;
+
+// Controllers Baru
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RekapAbsensiController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\KioskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,46 +45,61 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     
     // Dashboard Admin
-    Route::get('/', [AbsensiController::class, 'dashboard'])->name('dashboard'); 
+    Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard'); 
 
     // Rekap Absensi
-    Route::get('/data-absen', [AbsensiController::class, 'rekap'])->name('rekap');
-    Route::delete('/hapus-absen/{id}', [AbsensiController::class, 'hapusAbsensi'])->name('absen.hapus');
+    Route::get('/data-absen', [RekapAbsensiController::class, 'rekap'])->name('rekap');
+    Route::delete('/hapus-absen/{id}', [RekapAbsensiController::class, 'hapusAbsensi'])->name('absen.hapus');
 
     // Manajemen Profil Admin
-    Route::get('/profil', [AbsensiController::class, 'profil'])->name('profil');
-    Route::post('/profil/update', [AbsensiController::class, 'profilUpdate'])->name('profil.update');
+    Route::get('/profil', [ProfilController::class, 'profil'])->name('profil');
+    Route::post('/profil/update', [ProfilController::class, 'profilUpdate'])->name('profil.update');
 
-    Route::post('/generate-tidak-hadir', [AbsensiController::class, 'tandaiTidakHadir'])->name('generate.alpa');
+    Route::post('/generate-tidak-hadir', [RekapAbsensiController::class, 'tandaiTidakHadir'])->name('generate.alpa');
     
     // -------------------------------------------------------------------------
     // INPUT IZIN / SAKIT MANUAL OLEH ADMIN
     // -------------------------------------------------------------------------
-    Route::post('/input-izin-sakit', [AbsensiController::class, 'inputIzinSakitAdmin'])->name('admin.input_izin_sakit');
+    Route::post('/input-izin-sakit', [RekapAbsensiController::class, 'inputIzinSakitAdmin'])->name('admin.input_izin_sakit');
+    
+    // -------------------------------------------------------------------------
+    // INPUT ABSEN MANUAL (Mati Listrik / Error)
+    // -------------------------------------------------------------------------
+    Route::get('/input-absen-manual', [RekapAbsensiController::class, 'inputManual'])->name('admin.input_manual');
+    Route::post('/input-absen-manual', [RekapAbsensiController::class, 'storeManual'])->name('admin.store_manual');
     // -------------------------------------------------------------------------
 
     // ==========================================
-    // MANAJEMEN PEGAWAI
+    // PENGAJUAN IZIN / CUTI
     // ==========================================
-    Route::get('/tambah-pegawai', [AbsensiController::class, 'tambahPegawai'])->name('pegawai.tambah'); 
-    Route::post('/tambah-pegawai', [AbsensiController::class, 'simpanPegawai']); 
-    Route::get('/data-pegawai', [AbsensiController::class, 'dataPegawai']);
+    Route::post('/pengajuan-izin', [PengajuanIzinController::class, 'store'])->name('pengajuan.store');
+    Route::get('/laporan-pengajuan', [PengajuanIzinController::class, 'index'])->name('pengajuan.index');
+    Route::post('/laporan-pengajuan/{id}/status', [PengajuanIzinController::class, 'updateStatus'])->name('pengajuan.status');
 
-    Route::delete('/hapus-pegawai/{id}', [AbsensiController::class, 'hapusPegawai'])->name('pegawai.Dynamic'); 
-    Route::get('/daftar-wajah/{id}', [AbsensiController::class, 'daftar'])->name('pegawai.daftar');
+    // ==========================================
+    // MANAJEMEN PEGAWAI & JABATAN
+    // ==========================================
+    Route::post('/jabatan', [JabatanController::class, 'store'])->name('jabatan.store');
+    
+    Route::get('/tambah-pegawai', [PegawaiController::class, 'tambahPegawai'])->name('pegawai.tambah'); 
+    Route::post('/tambah-pegawai', [PegawaiController::class, 'simpanPegawai']); 
+    Route::get('/data-pegawai', [PegawaiController::class, 'dataPegawai']);
 
-    // Edit Pegawai sudah diubah menggunakan AbsensiController
-    Route::get('/pegawai/{id}/edit', [AbsensiController::class, 'edit'])->name('pegawai.edit');
-    Route::put('/pegawai/{id}', [AbsensiController::class, 'update'])->name('pegawai.update');
+    Route::delete('/hapus-pegawai/{id}', [PegawaiController::class, 'hapusPegawai'])->name('pegawai.Dynamic'); 
+    Route::get('/daftar-wajah/{id}', [PegawaiController::class, 'daftar'])->name('pegawai.daftar');
+
+    // Edit Pegawai
+    Route::get('/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
+    Route::put('/pegawai/{id}', [PegawaiController::class, 'update'])->name('pegawai.update');
 
     // Export Laporan
-    Route::get('/export-excel', [AbsensiController::class, 'exportExcel'])->name('export.excel');
+    Route::get('/export-excel', [RekapAbsensiController::class, 'exportExcel'])->name('export.excel');
 
     // ==========================================
     // PENGATURAN SISTEM
     // ==========================================
-    Route::get('/pengaturan', [AbsensiController::class, 'pengaturan'])->name('pengaturan');
-    Route::post('/pengaturan', [AbsensiController::class, 'simpanPengaturan'])->name('pengaturan.simpan');
+    Route::get('/pengaturan', [PengaturanController::class, 'pengaturan'])->name('pengaturan');
+    Route::post('/pengaturan', [PengaturanController::class, 'simpanPengaturan'])->name('pengaturan.simpan');
 
     // Memproses Logout
     Route::match(['get', 'post'], '/logout', function () {
@@ -90,10 +114,10 @@ Route::middleware('auth')->group(function () {
 // ==========================================
 // 3. RUTE KIOSK / MESIN ABSEN (Tanpa Login)
 // ==========================================
-Route::get('/scan', [AbsensiController::class, 'index'])->name('scan');
-Route::get('/get-pegawai', [AbsensiController::class, 'getPegawai']);
-Route::post('/catat-kehadiran', [AbsensiController::class, 'catatKehadiran']);
-Route::post('/simpan-wajah', [AbsensiController::class, 'simpanWajah']);
+Route::get('/scan', [KioskController::class, 'index'])->name('scan');
+Route::get('/get-pegawai', [KioskController::class, 'getPegawai']);
+Route::post('/catat-kehadiran', [KioskController::class, 'catatKehadiran']);
+Route::post('/simpan-wajah', [PegawaiController::class, 'simpanWajah']);
 
 
 // ==========================================
