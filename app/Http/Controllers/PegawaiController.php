@@ -115,7 +115,7 @@ class PegawaiController extends Controller
             'pegawai_id' => 'required|exists:pegawai,id', 
             'face_descriptor' => 'required',
             'telegram_chat_id' => 'nullable|numeric|unique:pegawai,telegram_chat_id,' . $request->pegawai_id,
-            'photo' => 'nullable|string'
+            'photos' => 'nullable|array'
         ]);
 
         $pegawai = Pegawai::find($request->pegawai_id);
@@ -124,13 +124,18 @@ class PegawaiController extends Controller
             $pegawai->telegram_chat_id = $request->telegram_chat_id; 
         }
 
-        if ($request->filled('photo')) {
-            $imageData = $request->photo;
-            $imageData = str_replace('data:image/jpeg;base64,', '', $imageData);
-            $imageData = str_replace(' ', '+', $imageData);
-            $imageName = 'pegawai_' . $pegawai->id . '_' . time() . '.jpg';
-            Storage::disk('public')->put('photos/' . $imageName, base64_decode($imageData));
-            $pegawai->photo = $imageName;
+        if ($request->filled('photos') && is_array($request->photos)) {
+            foreach ($request->photos as $index => $photoBase64) {
+                $imageData = str_replace('data:image/jpeg;base64,', '', $photoBase64);
+                $imageData = str_replace(' ', '+', $imageData);
+                $imageName = 'pegawai_' . $pegawai->id . '_' . time() . '_' . ($index + 1) . '.jpg';
+                Storage::disk('public')->put('photos/' . $imageName, base64_decode($imageData));
+                
+                // Simpan nama file foto pertama saja ke database (jika ada kolom photo)
+                if ($index === 0) {
+                    $pegawai->photo = $imageName;
+                }
+            }
         }
 
         $pegawai->save();

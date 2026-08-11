@@ -123,6 +123,8 @@
                     <div class="absolute inset-0 flex items-center justify-center bg-black/70 text-gray-500 text-xl" id="video-overlay">
                         <i class="fas fa-spinner fa-spin"></i>
                     </div>
+
+                    <canvas id="overlay-canvas" class="absolute inset-0 w-full h-full pointer-events-none transform scale-x-[-1] z-10"></canvas>
                 </div>
 
                 <div class="mt-8 flex gap-4 w-full max-w-md border-t border-slate-100 pt-8">
@@ -145,8 +147,10 @@
         const statusAlert = document.getElementById('statusAlert');
         const statusText = document.getElementById('statusText');
         const statusIcon = document.getElementById('statusIcon');
+        const overlayCanvas = document.getElementById('overlay-canvas');
 
         let currentStream = null;
+        let trackingInterval = null;
 
         // ==========================================
         // 1. FUNGSI UNTUK MENDAPATKAN DAFTAR KAMERA
@@ -190,8 +194,11 @@
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
             }
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+            }
 
-            video.style.opacity = '0'; 
+            video.style.opacity = '0';  
             videoOverlay.style.display = 'flex'; // Tambahan: Tampilkan overlay
 
             const constraints = {
@@ -212,6 +219,50 @@
                     video.style.opacity = '1'; 
                     updateStatus("Kamera Aktif. Silakan Posisikan Wajah.", "emerald");
                     btnCapture.disabled = false;
+                    
+                    // Setup Canvas
+                    overlayCanvas.width = video.videoWidth;
+                    overlayCanvas.height = video.videoHeight;
+                    const displaySize = { width: video.videoWidth, height: video.videoHeight };
+                    faceapi.matchDimensions(overlayCanvas, displaySize);
+
+                    // Mulai deteksi tracking wajah (realtime bounding box)
+                    trackingInterval = setInterval(async () => {
+                        const detection = await faceapi.detectSingleFace(video);
+                        const ctx = overlayCanvas.getContext('2d');
+                        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                        
+                        if (detection) {
+                            const resizedDetection = faceapi.resizeResults(detection, displaySize);
+                            const box = resizedDetection.box;
+                            
+                            // Style kotak tracking
+                            ctx.strokeStyle = '#f59e0b'; // amber-500
+                            ctx.lineWidth = 4;
+                            
+                            // Buat kotak bersudut agar lebih estetis
+                            const len = 20; // panjang sudut
+                            ctx.beginPath();
+                            // Kiri atas
+                            ctx.moveTo(box.x, box.y + len);
+                            ctx.lineTo(box.x, box.y);
+                            ctx.lineTo(box.x + len, box.y);
+                            // Kanan atas
+                            ctx.moveTo(box.x + box.width - len, box.y);
+                            ctx.lineTo(box.x + box.width, box.y);
+                            ctx.lineTo(box.x + box.width, box.y + len);
+                            // Kanan bawah
+                            ctx.moveTo(box.x + box.width, box.y + box.height - len);
+                            ctx.lineTo(box.x + box.width, box.y + box.height);
+                            ctx.lineTo(box.x + box.width - len, box.y + box.height);
+                            // Kiri bawah
+                            ctx.moveTo(box.x + len, box.y + box.height);
+                            ctx.lineTo(box.x, box.y + box.height);
+                            ctx.lineTo(box.x, box.y + box.height - len);
+                            
+                            ctx.stroke();
+                        }
+                    }, 150); // Jalankan deteksi tiap 150ms
                 };
             } catch (err) {
                 console.error("Gagal buka kamera:", err);
@@ -284,18 +335,25 @@
                     return;
                 }
 
-                updateStatus('Menyimpan data biometrik ke server...', 'blue');
-                updateStatus('Menyimpan data biometrik ke server...', 'blue');
+                updateStatus('Mengambil 20 foto wajah...', 'blue');
                 
-                // Tambahan: Capture foto mentah
+                // Tambahan: Capture 20 foto mentah
+                let photos = [];
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const photoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                
+                for(let i = 0; i < 20; i++) {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    photos.push(canvas.toDataURL('image/jpeg', 0.8));
+                    // Jeda 100ms antar foto
+                    await new Promise(r => setTimeout(r, 100));
+                    updateStatus(`Mengambil foto ${i+1}/20...`, 'blue');
+                }
 
-                simpanKeDatabase(Array.from(detection.descriptor), photoBase64);
+                updateStatus('Menyimpan data biometrik ke server...', 'blue');
+                simpanKeDatabase(Array.from(detection.descriptor), photos);
 
             } catch (error) {
                 console.error("Proses Error:", error);
@@ -308,7 +366,7 @@
         // ==========================================
         // 6. LOGIKA SIMPAN KE DATABASE (FETCH)
         // ==========================================
-        function simpanKeDatabase(descriptorArray, photoBase64) {
+        function simpanKeDatabase(descriptorArray, photosArray) {
             fetch("{{ url('/simpan-wajah') }}", {
                 method: "POST",
                 headers: {
@@ -318,7 +376,7 @@
                 body: JSON.stringify({
                     pegawai_id: "{{ $pegawai->id }}",
                     face_descriptor: JSON.stringify(descriptorArray),
-                    photo: photoBase64
+                    photos: photosArray
                 })
             }).then(res => res.json()).then(data => {
                 if (data.status === 'success') {
