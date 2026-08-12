@@ -94,7 +94,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-100">
-            <p class="text-xs text-center text-slate-400">Â© 2026 Lamarema Fashion</p>
+            <p class="text-xs text-center text-slate-400">&copy; 2026 Lamarema Fashion</p>
         </div>
     </div>
 
