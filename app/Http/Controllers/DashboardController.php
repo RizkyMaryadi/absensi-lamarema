@@ -19,7 +19,7 @@ class DashboardController extends Controller
         // JALUR 1: JIKA YANG LOGIN ADALAH PEGAWAI
         if ($pegawai->role === 'pegawai') {
             $absensiHariIni = Attendance::where('pegawai_id', $pegawai->id)
-                                ->whereDate('created_at', $hariIni)
+                                ->whereDate('date', $hariIni)
                                 ->get();
 
             $rekapAbsenPegawai = Attendance::where('pegawai_id', $pegawai->id)
@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
         // JALUR 2: JIKA YANG LOGIN ADALAH ADMIN
         $totalPegawai = Pegawai::where('role', 'pegawai')->count();
-        $absensiHariIniAdmin = Attendance::whereDate('created_at', $hariIni)->get();
+        $absensiHariIniAdmin = Attendance::whereDate('date', $hariIni)->get();
         $totalHadir = $absensiHariIniAdmin->count();
         $totalBelumHadir = $totalPegawai - $totalHadir;
 

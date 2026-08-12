@@ -135,7 +135,7 @@
                                 Jam Masuk Normal (WIB)
                             </label>
                             <p class="text-slate-500 text-sm mb-4">
-                                Tentukan jam masuk utama. Jika melewati jam ini, status tercatat <span class="text-rose-600 font-bold">Terlambat ðŸ”´</span>.
+                                Tentukan jam masuk utama. Jika melewati jam ini, status tercatat <span class="text-rose-600 font-bold">Terlambat</span>.
                             </p>
                             <div class="relative w-48">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-amber-500">
@@ -151,7 +151,7 @@
                                 Toleransi Terlambat (Menit)
                             </label>
                             <p class="text-slate-500 text-sm mb-4">
-                                Pegawai dianggap <span class="text-emerald-600 font-bold">Tepat Waktu ðŸŸ¢</span> selama dalam rentang ini.
+                                Pegawai dianggap <span class="text-emerald-600 font-bold">Tepat Waktu</span> selama dalam rentang ini.
                             </p>
                             <div class="relative w-48">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-amber-500">
