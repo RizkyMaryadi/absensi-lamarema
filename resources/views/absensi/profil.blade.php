@@ -130,7 +130,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-user text-slate-400"></i>
                         </div>
-                        <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-slate-700 font-medium" required>
+                        <input type="text" name="name" value="{{ old('name', $pegawai->name) }}" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-slate-700 font-medium" required>
                     </div>
                 </div>
 
@@ -140,7 +140,7 @@
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-envelope text-slate-400"></i>
                         </div>
-                        <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-slate-700 font-medium" required>
+                        <input type="email" name="email" value="{{ old('email', $pegawai->email) }}" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all text-slate-700 font-medium" required>
                     </div>
                 </div>
 
